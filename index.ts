@@ -1,12 +1,20 @@
 import express from "express"
+import { createServer } from "http"
+import { WebSocketServer } from "ws"
 
 const app = express()
-const port = process.env.PORT || 8000
+const server = createServer(app)
+const port = 8000
 
-app.get("/", (req, res) => {
-    res.send("Express + Typescript Server")
+const wss = new WebSocketServer({ server })
+wss.on("connection", (ws) => {
+    ws.on("error", console.error)
+
+    ws.on("message", (data) => {
+        console.log('received: %s', data)
+    })
+
+    ws.send("something")
 })
 
-app.listen(port, () => {
-    console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-})
+server.listen(port, "0.0.0.0")
